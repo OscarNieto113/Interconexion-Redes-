@@ -209,6 +209,7 @@ switchport mode trunk
 no shutdown
 
 
+
 !--Configuracion de la interfaz Virtual VLAN de Gestion
 int vlan 911
 description Interfaz de Gestion
