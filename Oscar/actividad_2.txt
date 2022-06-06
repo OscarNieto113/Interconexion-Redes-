@@ -1,0 +1,202 @@
+!------------------------------------- Copiar primero ---------------------
+!---Configuracion router Frontera Sucursal Campus queretaro-----
+!--Entrar a la config
+enable
+
+!--Configurar reloj
+clock set 10:11:00 May 31 2022
+
+!--Configurar terminal
+configure terminal
+!-- Nombre de la terminal
+hostname RF-SucursalCQ
+
+!-- Desactivar DNS
+no ip domain-lookup
+
+
+!--Contraseña encriptada
+service password-encryption
+
+!-- Mensaje de protección de ingreso
+banner motd #AwA de OwO#
+
+! Dar de alta los usuarios, uno por renglón, que podrán gestionar los equipos de interconexión
+username CEO privilege 15 secret tc2006B
+username CIT privilege 15 secret tc2006B
+
+! Para activar el protocolo SSH en los equipos de interconexión, es necesario dar de alta nuestro dominio (solo es local
+!- al equipo de interconexión):
+ip domain-name KavaHAUSS.com
+crypto key generate rsa
+!------------------------------------- Copiar primero (Enter -> Yes -> 1024)---------------------
+!- delete vlan.dat
+!- enter
+!------------------------------------- Copiar despues ---------------------
+line vty 0 4
+login local
+transport input ssh
+
+line console 0
+login local
+logging sync
+
+!------------------------------------- Copiar despues ---------------------
+
+
+!-- Configuracion del DHCP
+!-- Direccion del servidor
+ip dhcp excluded-address 192.168.20.62
+
+!-- Nombre Clientes
+ip dhcp pool clientes
+!-- Bloque de direcciones
+ network 192.168.20.0 255.255.255.192
+default-router 192.168.20.62
+dns-server 8.8.8.8
+
+ip dhcp excluded-address 192.168.20.78
+!-- Nombre Gerencia
+ip dhcp pool gerencia
+!-- Bloque de direcciones
+ network 192.168.20.64 255.255.255.240
+default-router 192.168.20.78
+dns-server 8.8.8.8
+
+
+!-- Configuracion de las sub interfaces--------------------
+int f0/0.1
+description VLAN de gestion
+encapsulation dot1q 1
+ip address 192.168.20.94 255.255.255.248
+
+int f0/0.100
+description VLAN de clientes
+encapsulation dot1q 100
+ip address 192.168.20.62 255.255.255.192
+
+int f0/0.200
+description VLAN de cajas
+encapsulation dot1q 200
+ip address 192.168.20.86 255.255.255.248
+
+int f0/0.300
+description VLAN de gerencia
+encapsulation dot1q 300
+ip address 192.168.20.78 255.255.255.240
+
+int f0/0.400
+description VLAN de Servers
+encapsulation dot1q 400
+ip address 192.168.20.102 255.255.255.248
+
+! Al final de dar de alta todas las subinterfaces, hay que activar la interfaz física correspondiente
+int f0/0
+no shutdown
+
+
+
+
+int f0/1
+description Interfaz con el ISP
+ip address 192.168.20.254 255.255.255.252
+no shutdown
+
+!--Ruta por default (Saca todo el trafico a internet)
+ip route 0.0.0.0 0.0.0.0 f0/1
+
+!sh ip int brief
+!-------------------------------------------------------------------------------------
+
+!borrar configuracion de switch
+!reload -> no -> Enter
+
+
+!Configuracion del switch S-
+!--Entrar a la config
+enable
+
+!--Configurar reloj
+clock set 10:11:00 May 31 2022
+
+!--Configurar terminal
+configure terminal
+!-- Nombre de la terminal
+hostname S-SucursalCQ
+
+!-- Desactivar DNS
+no ip domain-lookup
+
+
+!--Contraseña encriptada
+service password-encryption
+
+!Asignar contraseña (AHORA ESTA CIFRADA)
+enable secret tc2006B
+
+!-- Mensaje de protección de ingreso
+banner motd #Estas entrando a un equipo protegido, si decides continuar puedes ser perseguido por la ley#
+
+!--Asignar password a la linea de la consola
+line console 0
+password tc2006b
+
+!-- Para que al usuario le pregunte el password
+login
+logging sync
+
+!-- Configuracion para acceso remoto (DEFAULT 0 a 4 max)
+line vty 0 4
+password TC2006b
+login
+logging sync
+
+
+! Creación de las VLANs con nombre.
+vlan 100
+name clientes
+
+vlan 200
+name Cajas
+
+vlan 300
+name gerencia
+
+vlan 400
+name Servers
+
+
+! Asignación de puertos a la VLAN clientes
+interface range F0/20-24
+switchport mode access
+switchport access vlan 100
+
+! Asignación de puertos a la VLAN cajas
+interface range F0/1-6
+switchport mode access
+switchport access vlan 200
+
+! Asignación de puertos a la VLAN gerencia
+interface range F0/10-16
+switchport mode access
+switchport access vlan 300
+
+! Asignación de puertos a la VLAN Servers
+interface G0/2
+switchport mode access
+switchport access vlan 400
+
+
+! Definición del o los puertos TRUNK
+interface G0/1
+switchport mode trunk
+no shutdown
+
+
+!--Configuracion de la interfaz Virtual VLAN 1
+int vlan 1
+description Interfaz de Gestion
+ip address 192.168.20.89 255.255.255.248
+no shutdown
+
+ip default-gateway 192.168.20.94

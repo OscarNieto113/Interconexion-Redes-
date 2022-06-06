@@ -1,0 +1,145 @@
+------------------------
+--------- MyISP --------
+------------------------
+! Ya Configurado !!!!
+
+! RUTAS ESTÁTICAS
+!rutas estaticas directamente conectadas hacia subred verde
+ip route 215.60.127.0 255.255.255.224 S0/0/0
+ip route 196.128.11.128 255.255.255.192 S0/0/0
+
+--------------------------
+-------- YuyasRouter -------
+--------------------------
+enable
+config t
+
+hostname YuyasRouter
+
+!Encriptar passwords
+service password-enc
+
+! Desactivar DNS
+no ip domain-lookup
+
+! Password de la consola
+line con 0
+password cisco
+login
+logging sync
+
+! Conexión TELNET o para configurar SSH
+line vty 0 4
+password cisco
+login
+logging sync
+
+! Password para entrar a modo privilegiado
+enable password class
+
+int S0/0/0
+desc Interfaz que conecta con el ISP
+ip address 132.254.255.254 255.255.255.252
+no shut
+
+int g0/0
+desc Interfaz que conecta con el SwitchStudio
+ip address 215.60.127.29 255.255.255.224
+no shut
+
+int g0/1
+desc Interfaz que conecta con el SwitchServicios
+ip address 215.60.127.45 255.255.255.40
+no shut
+
+!--Ruta por default (Saca todo el trafico a internet)
+ip route 0.0.0.0 0.0.0.0 s0/0/0
+
+! ----------------------------
+! Configuración DHCP
+! ----------------------------
+ip dhcp pool Studio_g0/0
+
+network 215.60.127.0 255.255.255.224
+default-router 215.60.127.30
+ip dhcp excluded-address 215.60.127.29 215.60.127.30
+ip dhcp excluded-address 215.60.127.1 215.60.127.2
+
+
+! RUTAS ESTÁTICAS
+! Ruta estatica directamente conectada subred morada
+ip route 215.60.127.0 255.255.255.224 g0/0
+
+! Ruta estatica del next hop hacia subred amarilla
+ip route 215.60.127.32 255.255.255.240 g0/1
+
+!ruta por default hacia el proveedor de servicios (ISP)
+!ruta por default del next hop
+ip route 0.0.0.0 0.0.0.0 132.254.255.252
+!Ruta por default directamente conectada
+ip route 0.0.0.0 0.0.0.0 s0/0/0
+!Ruta por default completamente conectada
+!ip route 0.0.0.0 0.0.0.0 s0/0/0 132.254.255.254
+
+! ============================
+! ============ SwitchStudio ============
+! ============================
+
+enable
+config t
+hostname SwitchStudio
+
+no ip domain-lookup
+
+enable password class
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 15
+password cisco
+login
+logging sync
+
+int vlan 1
+description Conexion con el switch de Studio
+ip address 215.60.127.29 255.255.255.224
+no shut
+
+ip default-gateway 215.60.127.30
+
+banner motd #Prohibido accesos no autorizados#
+
+
+! ============================
+! ============ SwitchServicios ============
+! ============================
+
+enable
+config t
+hostname SwitchServicios
+
+no ip domain-lookup
+
+enable password class
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 15
+password cisco
+login
+logging sync
+
+int vlan 1
+description Conexión del switch Servicios con g0/0
+ip address 215.60.127.45 255.255.255.240
+no shut
+
+ip default-gateway 215.60.127.46
+
+banner motd #Prohibido accesos no autorizados#

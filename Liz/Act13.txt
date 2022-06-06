@@ -1,0 +1,121 @@
+------------------------
+--------- MyISP --------
+------------------------
+! Ya Configurado !!!!
+
+! RUTAS ESTÁTICAS
+!Ruta estatica next hop hacia subred amarilla
+ip route 221.57.1.0 255.255.255.0 134.89.254.242
+!rutas estaticas directamente conectadas hacia subred verde
+ip route 196.128.11.0 255.255.255.192 S0/0/0
+ip route 196.128.11.12 255.255.255.192 S0/0/0
+--------------------------
+-------- RFrontera -------
+--------------------------
+enable
+config t
+
+hostname RF
+
+!Encriptar passwords
+service password-enc
+
+! Desactivar DNS
+no ip domain-lookup
+
+! Password de la consola
+line con 0
+password cisco
+login
+logging sync
+
+! Conexión TELNET o para configurar SSH
+line vty 0 4
+password cisco
+login
+logging sync
+
+! Password para entrar a modo privilegiado
+enable password class
+
+int S0/0/0
+desc Interfaz que conecta con el ISP
+ip address 134.89.254.242 255.255.255.252
+no shut
+
+int S0/0/1
+description Conexion con router A
+ip address 198.68.1.250 255.255.255.252
+!Se agrega cuando se tiene el reloj en el port o cuando es DCE
+clock rate 128000
+no shut
+
+int g0/0
+desc Conexion con subred amarilla
+ip address 221.57.1.254 255.255.255.0
+no shut
+
+! RUTAS ESTÁTICAS
+! Ruta estatica directamente conectada subred verde izquierda
+ip route 196.128.11.0 255.255.255.192 s0/0/1
+! Ruta estatica del next hop hacia subred verde derecha
+ip route 196.128.11.128 255.255.255.192 198.68.1.250
+
+!ruta por default hacia el proveedor de servicios (ISP)
+!ruta por default del next hop
+ip route 0.0.0.0 0.0.0.0 134.89.254.241
+!Ruta por default directamente conectada
+ip route 0.0.0.0 0.0.0.0 s0/0/0
+!Ruta por default completamente conectada
+!ip route 0.0.0.0 0.0.0.0 s0/0/0 134.89.254.241
+
+----------------------
+-------- RA ----------
+----------------------
+
+enable
+config t
+
+hostname RA
+
+!Encriptar passwords
+service password-enc
+
+! Desactivar DNS
+no ip domain-lookup
+
+! Password de la consola
+line con 0
+password cisco
+login
+logging sync
+
+! Conexión TELNET o para configurar SSH
+line vty 0 4
+password cisco
+login
+logging sync
+
+! Password para entrar a modo privilegiado
+enable password class
+
+int S0/0/0
+description Conexion con el router frontera
+ip address 198.68.1.250 255.255.255.252
+no shut
+
+int g0/0
+description Conexion con subred Verde izquierda
+ip address 196.128.11.62 255.255.255.192
+no shut
+
+int g0/1
+description Conexion con subred verde derecha
+ip address 196.128.11.190 255.255.255.192
+no shut
+
+! RUTAS ESTÁTICAS
+!Ruta estatica recursiva hacia subred amarilla
+ip route 221.57.1.0 255.255.255.0 198.68.1.249
+!Ruta estatica directamente conectada hacia subred azul
+ip route 151.101.1.64 255.255.255.192 S0/0/0
