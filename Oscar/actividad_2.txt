@@ -1,5 +1,5 @@
 !------------------------------------- Copiar primero ---------------------
-!---Configuracion router Frontera Sucursal Campus queretaro-----
+!---Configuracion router Frontera RF-Coworq-----
 !--Entrar a la config
 enable
 
@@ -9,7 +9,7 @@ clock set 10:11:00 May 31 2022
 !--Configurar terminal
 configure terminal
 !-- Nombre de la terminal
-hostname RF-SucursalCQ
+hostname RF-Coworq
 
 !-- Desactivar DNS
 no ip domain-lookup
@@ -22,12 +22,11 @@ service password-encryption
 banner motd #AwA de OwO#
 
 ! Dar de alta los usuarios, uno por renglón, que podrán gestionar los equipos de interconexión
-username CEO privilege 15 secret tc2006B
 username CIT privilege 15 secret tc2006B
 
 ! Para activar el protocolo SSH en los equipos de interconexión, es necesario dar de alta nuestro dominio (solo es local
 !- al equipo de interconexión):
-ip domain-name KavaHAUSS.com
+ip domain-name CoworQ.com
 crypto key generate rsa
 !------------------------------------- Copiar primero (Enter -> Yes -> 1024)---------------------
 !- delete vlan.dat
@@ -43,47 +42,56 @@ logging sync
 
 !------------------------------------- Copiar despues ---------------------
 
-
-!-- Configuracion del DHCP
-!-- Direccion del servidor
-ip dhcp excluded-address 192.168.20.62
-
-!-- Nombre Clientes
-ip dhcp pool clientes
+!-- Direccion de Entretenimiento
+ip dhcp excluded-address 192.168.100.78
+ip dhcp pool Entretenimiento
 !-- Bloque de direcciones
- network 192.168.20.0 255.255.255.192
-default-router 192.168.20.62
-dns-server 8.8.8.8
+ network 192.168.100.64 255.255.255.240
+ default-router 192.168.100.78
+ dns-server 8.8.8.8
 
-ip dhcp excluded-address 192.168.20.78
-!-- Nombre Gerencia
-ip dhcp pool gerencia
-!-- Bloque de direcciones
- network 192.168.20.64 255.255.255.240
-default-router 192.168.20.78
-dns-server 8.8.8.8
+ !-- Direccion de Educacion
+ ip dhcp excluded-address 192.168.100.86
+ ip dhcp pool Educacion
+ !-- Bloque de direcciones
+  network 192.168.100.80 255.255.255.248
+  default-router 192.168.100.86
+  dns-server 8.8.8.8
+
+  !-- Direccion de Teletrabajo
+  ip dhcp excluded-address 192.168.100.28 192.168.100.30
+  ip dhcp pool Teletrabajo
+  !-- Bloque de direcciones
+   network 192.168.100.0 255.255.255.224
+   default-router 192.168.100.30
+   dns-server 8.8.8.8
 
 
 !-- Configuracion de las sub interfaces--------------------
-int f0/0.1
-description VLAN de gestion
-encapsulation dot1q 1
-ip address 192.168.20.94 255.255.255.248
-
-int f0/0.100
-description VLAN de clientes
+int g0/0/1.100
+description VLAN de Entretenimiento
 encapsulation dot1q 100
-ip address 192.168.20.62 255.255.255.192
+ip address 192.168.100.78 255.255.255.240
 
-int f0/0.200
-description VLAN de cajas
+int g0/0/1.200
+description VLAN de Educacion
 encapsulation dot1q 200
-ip address 192.168.20.86 255.255.255.248
+ip address 192.168.100.86 255.255.255.248
 
-int f0/0.300
-description VLAN de gerencia
+int g0/0/1.300
+description VLAN de IoT
 encapsulation dot1q 300
-ip address 192.168.20.78 255.255.255.240
+ip address 192.168.100.46 255.255.255.240
+
+int g0/0/1.600
+description VLAN de Teletrabajo
+encapsulation dot1q 600
+ip address 192.168.100.30 255.255.255.224
+
+int g0/0/1.911
+description VLAN de Teletrabajo
+encapsulation dot1q 911
+ip address 192.168.100.134 255.255.255.248
 
 int f0/0.400
 description VLAN de Servers
@@ -91,19 +99,24 @@ encapsulation dot1q 400
 ip address 192.168.20.102 255.255.255.248
 
 ! Al final de dar de alta todas las subinterfaces, hay que activar la interfaz física correspondiente
-int f0/0
+int g0/0/1
 no shutdown
 
-
-
-
-int f0/1
+int g0/0/0
 description Interfaz con el ISP
-ip address 192.168.20.254 255.255.255.252
+ip address 192.168.100.254 255.255.255.252
+no shutdown
+
+int s0/1/0
+description Interfaz con el ISP Secundario C3NTRO Telecom
+ip address 172.16.255.234 255.255.255.2552
 no shutdown
 
 !--Ruta por default (Saca todo el trafico a internet)
-ip route 0.0.0.0 0.0.0.0 f0/1
+ip route 0.0.0.0 0.0.0.0 g0/0/0
+
+!Ruta por default flotante (ISP Secundario)
+ip route 0.0.0.0 0.0.0.0 S0/1/0 5
 
 !sh ip int brief
 !-------------------------------------------------------------------------------------
@@ -122,7 +135,7 @@ clock set 10:11:00 May 31 2022
 !--Configurar terminal
 configure terminal
 !-- Nombre de la terminal
-hostname S-SucursalCQ
+hostname S-CoworQ
 
 !-- Desactivar DNS
 no ip domain-lookup
@@ -154,37 +167,40 @@ logging sync
 
 ! Creación de las VLANs con nombre.
 vlan 100
-name clientes
+name Entretenimiento
 
 vlan 200
-name Cajas
+name Educacion
 
 vlan 300
-name gerencia
+name IoT
 
-vlan 400
-name Servers
+vlan 600
+name Teletrabajo
+
+vlan 911
+name Gestion
 
 
-! Asignación de puertos a la VLAN clientes
-interface range F0/20-24
+! Asignación de puertos a la VLAN Entretenimiento
+interface range F0/1
 switchport mode access
 switchport access vlan 100
 
-! Asignación de puertos a la VLAN cajas
-interface range F0/1-6
+! Asignación de puertos a la VLAN Educacion
+interface range F0/8-14
 switchport mode access
 switchport access vlan 200
 
-! Asignación de puertos a la VLAN gerencia
-interface range F0/10-16
+! Asignación de puertos a la VLAN IoT
+interface range F0/15-20
 switchport mode access
 switchport access vlan 300
 
-! Asignación de puertos a la VLAN Servers
+! Asignación de puertos a la VLAN Teletrabajo
 interface G0/2
 switchport mode access
-switchport access vlan 400
+switchport access vlan 600
 
 
 ! Definición del o los puertos TRUNK
@@ -193,10 +209,10 @@ switchport mode trunk
 no shutdown
 
 
-!--Configuracion de la interfaz Virtual VLAN 1
-int vlan 1
+!--Configuracion de la interfaz Virtual VLAN de Gestion
+int vlan 911
 description Interfaz de Gestion
-ip address 192.168.20.89 255.255.255.248
+ip address 192.168.100.129 255.255.255.248
 no shutdown
 
-ip default-gateway 192.168.20.94
+ip default-gateway 192.168.100.134
