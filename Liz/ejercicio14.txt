@@ -1,0 +1,115 @@
+! ===========================
+! ======== RPisos ==========
+! ===========================
+
+ena
+config t
+hostname RPisos
+no ip domain-lookup
+
+enable secret class
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 4
+password cisco
+login
+
+int g0/1
+desc Interfaz ISP
+ip address 20.1.1.5 255.255.255.252
+no shut
+
+!Configuración del DHCP 
+ip dhcp excluded-address 192.168.100.78
+ip dhcp pool Entretenimiento
+network 192.168.100.64 255.255.255.240
+default-router 192.168.100.78
+dns-server 8.8.8.8
+
+! Declaracion de subinterfaces.
+
+int g0/0.5
+desc VLAN Empleados
+encapsulation  dot1q  5
+ip add 200.10.5.62 255.255.255.192
+
+int g0/0.10
+desc VLAN Directivos
+encapsulation  dot1q  10
+ip add 200.10.5.70 255.255.255.248
+
+int g0/0.1
+desc VLAN Gestión
+encapsulation  dot1q  1
+ip add 200.10.5.74 255.255.255.252
+
+! Al final de dar de alta todas las subinterfaces, hay que activar la interfaz física correspondiente
+int g0/0
+no shut
+
+! Establecer una ruta por default que se encargue de sacar el trafico a Internet.
+ip route 0.0.0.0 0.0.0.0 g0/1
+
+! ====================
+! ===== SPisos ======
+! ====================
+
+ena
+conf t
+hostname SPisos
+no ip domain-lookup
+
+enable secret class
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 15
+password cisco
+login
+
+! Creacion de la base de datos de las VLANs
+
+vlan 5
+name Empleados
+exit
+
+vlan 10
+name Directivos
+exit
+
+! Definicion de los puertos de acceso y troncal
+
+interface range f0/1-19
+switchport mode access
+switchport access vlan 5
+
+interface range f0/20-24
+switchport mode access
+switchport access vlan 10
+
+! Definición del o los puertos TRUNK
+interface g0/1
+switchport mode trunk
+no shut
+
+
+int vlan 1
+description VLAN Admin
+ip address 200.10.5.73 255.255.255.252
+no shut
+
+ip default-gateway 200.10.5.74
+
+! ===========================
+! ======== ISP ==========
+! ===========================
+
+! Definir ruta estatica hacia la red local de Pisos y Mas.
+ip route 200.10.5.0 255.255.255.0 20.1.1.5
