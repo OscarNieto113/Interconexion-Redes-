@@ -1,0 +1,47 @@
+! ==========================================
+! ============ RouterBasicon ================
+! ==========================================
+!Establecer fecha
+enable
+clock set 5:55:00 May 31 2022
+
+!Establecer nombre del equipo
+configure terminal
+hostname SwitchOwO
+
+!Deshabilitar DNS
+no ip domain-lookup
+
+!Contraseña encriptada
+service password-encryption
+
+!Contraseña de enable
+enable secret OwO
+
+!Establecer banner
+banner motd #AwA de OwO#
+
+!Asignar password a la linea de la consola 0
+line console 0
+password OwO
+login
+logging sync
+
+!Configuracion para acceso remoto (DEFAULT 0 a 4 max) line vty
+line vty 0 4
+password OwO
+login
+logging sync
+
+!Establecer la IP del Router
+int G0/0
+description UwU
+ip address 192.168.10.254 255.255.255.0
+no shut
+
+!Configurar Loopback sirva para el TELNET
+interface loopback 0
+descrip Interfaz con el loopback
+!"ip loopback" "mascara loopback"
+ip address 1.1.1.1 255.255.255.0
+no shut
