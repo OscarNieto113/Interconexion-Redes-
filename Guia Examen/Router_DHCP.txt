@@ -1,0 +1,69 @@
+! ==========================================
+! ============ RouterBasicon ================
+! ==========================================
+!Establecer fecha
+enable
+clock set 5:55:00 May 31 2022
+
+!Establecer nombre del equipo
+configure terminal
+hostname R1
+
+!Deshabilitar DNS
+no ip domain-lookup
+
+!Contraseña de enable
+enable secret class
+
+!Establecer banner
+banner motd #AwA de OwO#
+
+!Asignar password a la linea de la consola 0
+line console 0
+password cisco
+login
+logging sync
+
+!Configuracion para acceso remoto (DEFAULT 0 a 4 max) line vty
+line vty 0 4
+password cisco
+login
+logging sync
+
+!Establecer la IP del Router
+int G0/0
+description UwU
+ip address 200.10.5.70 255.255.255.192
+no shut
+
+int G0/1
+description UwU
+ip address 200.10.5.70 255.255.255.248
+no shut
+
+!Configurar Loopback sirva para el TELNET
+interface loopback 0
+descrip Interfaz con el loopback
+!"ip loopback" "mascara loopback"
+ip address 2.2.2.2 255.255.255.248
+no shut
+
+!-----------Configurar DHCP1--------------
+!Se exluyen las ips estaticas de la subred
+ip dhcp excluded-address 200.10.5.61 200.10.5.62
+ip dhcp pool empleados
+!Bloque de direcciones ("IP de la subred" "Mascara de subred")
+network 200.10.5.0 255.255.255.192
+!IP del puerto al que esta conectada la subred
+default-router 200.10.5.62
+!-----------Configurar DHCP1--------------
+
+!-----------Configurar DHCP2--------------
+!Se exluyen las ips estaticas de la subred
+ip dhcp excluded-address 200.10.5.125 200.10.5.126
+ip dhcp pool Admins
+!Bloque de direcciones ("IP de la subred" "Mascara de subred")
+network 200.10.5.64 255.255.255.192
+!IP del puerto al que esta conectada la subred
+default-router 200.10.5.125
+!-----------Configurar DHCP2--------------

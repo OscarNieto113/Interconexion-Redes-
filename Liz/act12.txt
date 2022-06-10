@@ -1,101 +1,145 @@
----------------------------------------------------------------
-Configuraci�n parcial del router MyNewProject
----------------------------------------------------------------
-ena
-config t
-hostname MyNewProject
-enable secret class
+! ==========================================
+! ============ RouterBasicon ================
+! ==========================================
+!Establecer fecha
+enable
+clock set 5:55:00 May 31 2022
+
+!Establecer nombre del equipo
+configure terminal
+hostname R1
+
+!Deshabilitar DNS
 no ip domain-lookup
 
-line con 0
+!Contraseña de enable
+enable secret class
+
+!Establecer banner
+banner motd #AwA de OwO#
+
+!Asignar password a la linea de la consola 0
+line console 0
 password cisco
 login
 logging sync
 
+!Configuracion para acceso remoto (DEFAULT 0 a 4 max) line vty
 line vty 0 4
 password cisco
 login
+logging sync
 
-int g0/0
-ip add
+!Establecer la IP del Router
+int G0/0
+description UwU
+ip address 200.10.5.70 255.255.255.192
 no shut
 
---- En esta secci�n debes incluir la configuraci�n de las Subinterfaces ---
---------------------------------------------------------------------------------------------------
-int g0/1.10
-desc VLAN Home Office
-encapsulation  dot1q  10
-ip add 192.168.10.126 255.255.255.128
-
-int g0/1.20
-desc VLAN Entretenimiento
-encapsulation  dot1q  20
-ip add 192.168.10.190 255.255.255.192
-
-int g0/1.1
-desc VLAN Gestion
-encapsulation  dot1q  1
-ip add 192.168.10.194 255.255.255.252
-
-int g0/1
+int G0/1
+description UwU
+ip address 200.10.5.70 255.255.255.248
 no shut
 
-int g0/0
-desc Interfaz ISP
-ip address 192.168.10.253 255.255.255.252
+!Configurar Loopback sirva para el TELNET
+interface loopback 0
+descrip Interfaz con el loopback
+!"ip loopback" "mascara loopback"
+ip address 2.2.2.2 255.255.255.248
 no shut
 
-! Establecer una ruta por default que se encargue de sacar el trafico a Internet.
-ip route 0.0.0.0 0.0.0.0 g0/0
+!-----------Configurar DHCP--------------
+!Se exluyen las ips estaticas de la subred
+ip dhcp excluded-address 200.10.5.61 200.10.5.62
+ip dhcp pool empleados
+!Bloque de direcciones ("IP de la subred" "Mascara de subred")
+network 200.10.5.0 255.255.255.192
+!IP del puerto al que esta conectada la subred
+default-router 200.10.5.62
 
------------------------------------------------------
-Configuraci�n parcial del switch S-NewVLANs
------------------------------------------------------
-ena
-config t
-hostname S-NewVLANs
-enable secret class
+
+! ==========================================
+! ============ Switch1 ================
+! ==========================================
+!Establecer fecha
+enable
+clock set 5:55:00 May 31 2022
+
+!Establecer nombre del equipo
+configure terminal
+hostname S1
+
+!Deshabilitar DNS
 no ip domain-lookup
 
-line con 0
+!Contraseña de enable
+enable secret class
+
+!Establecer banner
+banner motd #AwA de OwO#
+
+!Asignar password a la linea de la consola 0
+line console 0
 password cisco
 login
 logging sync
 
-line vty 0 15
+!Configuracion para acceso remoto (DEFAULT 0 a 4 max) line vty
+line vty 0 4
 password cisco
 login
+logging sync
 
--- En esta secci�n agregar los comandos de configuraci�n de VLANs --
------------------------------------------------------------------------------------------------
-
-vlan 10
-name HomeOffice
-
-vlan 20
-name Entretenimiento
-
-!vlan 1
-!name Entretenimiento
-
-! Definicion de los puertos de acceso y troncal
-
-interface range f0/1-15
-switchport mode access
-switchport access vlan 10
-
-interface range f0/16-24
-switchport mode access
-switchport access vlan 20
-
-! Definición del o los puertos TRUNK
-interface g0/1
-switchport mode trunk
-no shut
-
+!En el caso de que solo sea una subred se tiene que encender la VLAN 1 (por defecto)
+!ip address = "IP del switch" "Mascara del switch"
 int vlan 1
-description VLAN Admin
-ip address 192.168.10.193 255.255.255.252
+descrip Interfaz de gestión
+ip address 200.10.5.61 255.255.255.192
 no shut
 
-ip default-gateway 192.168.10.194
+!Establecer puerta de enlace predeterminada
+!Default-G del switch
+ip default-gateway 200.10.5.62
+
+! ==========================================
+! ============ Switch2 ================
+! ==========================================
+!Establecer fecha
+enable
+clock set 5:55:00 May 31 2022
+
+!Establecer nombre del equipo
+configure terminal
+hostname S2
+
+!Deshabilitar DNS
+no ip domain-lookup
+
+!Contraseña de enable
+enable secret class
+
+!Establecer banner
+banner motd #AwA de OwO#
+
+!Asignar password a la linea de la consola 0
+line console 0
+password cisco
+login
+logging sync
+
+!Configuracion para acceso remoto (DEFAULT 0 a 4 max) line vty
+line vty 0 4
+password cisco
+login
+logging sync
+
+!En el caso de que solo sea una subred se tiene que encender la VLAN 1 (por defecto)
+!ip address = "IP del switch" "Mascara del switch"
+int vlan 1
+descrip Interfaz de gestión
+ip address 200.10.5.69 255.255.255.248
+no shut
+
+!Establecer puerta de enlace predeterminada
+!Default-G del switch
+ip default-gateway 200.10.5.70

@@ -1,0 +1,38 @@
+!RA
+enable
+clock set 00:00:00 Oct 13 2000
+configure terminal
+hostname RA
+no ip domain-lookup
+
+banner motd #AwA de OwO#
+
+service password-encryption
+
+enable secret OwO
+
+line console 0
+password OwO
+login
+logging sync
+
+
+line vty 0 4
+password OwO
+login
+logging sync
+
+int g0/0
+desc
+ip address 196.128.11.62 255.255.255.198
+no shut
+
+int g0/1
+desc
+ip address 196.128.11.190 255.255.255.198
+no shut
+
+int s0/0/0
+desc
+ip address 192.68.1.250 255.255.255.252
+no shut
