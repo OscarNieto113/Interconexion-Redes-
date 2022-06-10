@@ -188,14 +188,18 @@ switchport mode access
 switchport access vlan 200
 
 ! Asignación de puertos a la VLAN IoT
-interface range F0/16-20
+interface range F0/15-20
 switchport mode access
 switchport access vlan 300
 
+! Asignación de puertos a la VLAN Teletrabajo
+interface G0/2
+switchport mode access
+switchport access vlan 600
 
 
 ! Definición del o los puertos TRUNK
-interface range G0/1-2, f0/15
+interface G0/1
 switchport mode trunk
 no shutdown
 
@@ -266,22 +270,17 @@ name Gestion
 
 
 ! Asignación de puertos a la VLAN Entretenimiento
-interface range F0/1-24, g0/2
+interface range F0/1-24, g0/1-2
 switchport mode access
 switchport access vlan 300
 
-! Definición del o los puertos TRUNK
-interface range G0/1
-switchport mode trunk
-no shutdown
-
-!--Configuracion de la interfaz Virtual VLAN de Gestion
-int vlan 911
+!--Configuracion de la interfaz Virtual VLAN de IoT
+int vlan 300
 desc Interfaz de Gestion
-ip address 192.168.100.130 255.255.255.248
+ip address 192.168.100.45 255.255.255.240
 no shutdown
 
-ip default-gateway 192.168.100.134
+ip default-gateway 192.168.100.46
 
 
 
@@ -342,19 +341,14 @@ name Gestion
 
 
 ! Asignación de puertos a la VLAN Entretenimiento
-interface range F0/1-24, g0/2
+interface range F0/1-24, g0/1-2
 switchport mode access
 switchport access vlan 600
 
-! Definición del o los puertos TRUNK
-interface range G0/1
-switchport mode trunk
+!--Configuracion de la interfaz Virtual VLAN de Teletrabajo
+int vlan 600
+desc Interfaz de Teletrabajo
+ip address 192.168.100.27 255.255.255.224
 no shutdown
 
-!--Configuracion de la interfaz Virtual VLAN de Gestion
-int vlan 911
-desc Interfaz de Gestion
-ip address 192.168.100.131 255.255.255.248
-no shutdown
-
-ip default-gateway 192.168.100.134
+ip default-gateway 192.168.100.130
