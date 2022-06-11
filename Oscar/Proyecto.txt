@@ -1,18 +1,135 @@
 ! ==========================================
 ! ============ RouterFrontera ==============
 ! ==========================================
+!--Entrar a la config
+enable
 
+!--Configurar reloj
+clock set 10:11:00 May 31 2022
 
-! ==========================================
-! ============ RouterAT&T ==================
-! ==========================================
+!--Configurar terminal
+configure terminal
 
+!-- Nombre de la terminal
+hostname RouterFrontera
+
+!-- Desactivar DNS
+no ip domain-lookup
+
+!--Contraseña encriptada
+service password-encryption
+
+!-- Mensaje de protección de ingreso
+banner motd #
+⣿⣿⣷⡁⢆⠈⠕⢕⢂⢕⢂⢕⢂⢔⢂⢕⢄⠂⣂⠂⠆⢂⢕⢂⢕⢂⢕⢂⢕⢂
+⣿⣿⣿⡷⠊⡢⡹⣦⡑⢂⢕⢂⢕⢂⢕⢂⠕⠔⠌⠝⠛⠶⠶⢶⣦⣄⢂⢕⢂⢕
+⣿⣿⠏⣠⣾⣦⡐⢌⢿⣷⣦⣅⡑⠕⠡⠐⢿⠿⣛⠟⠛⠛⠛⠛⠡⢷⡈⢂⢕⢂
+⠟⣡⣾⣿⣿⣿⣿⣦⣑⠝⢿⣿⣿⣿⣿⣿⡵⢁⣤⣶⣶⣿⢿⢿⢿⡟⢻⣤⢑⢂
+⣾⣿⣿⡿⢟⣛⣻⣿⣿⣿⣦⣬⣙⣻⣿⣿⣷⣿⣿⢟⢝⢕⢕⢕⢕⢽⣿⣿⣷⣔
+⣿⣿⠵⠚⠉⢀⣀⣀⣈⣿⣿⣿⣿⣿⣿⣿⣿⣿⣗⢕⢕⢕⢕⢕⢕⣽⣿⣿⣿⣿
+⢷⣂⣠⣴⣾⡿⡿⡻⡻⣿⣿⣴⣿⣿⣿⣿⣿⣿⣷⣵⣵⣵⣷⣿⣿⣿⣿⣿⣿⡿
+⢌⠻⣿⡿⡫⡪⡪⡪⡪⣺⣿⣿⣿⣿⣿⠿⠿⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠃
+⠣⡁⠹⡪⡪⡪⡪⣪⣾⣿⣿⣿⣿⠋⠐⢉⢍⢄⢌⠻⣿⣿⣿⣿⣿⣿⣿⣿⠏⠈
+⡣⡘⢄⠙⣾⣾⣾⣿⣿⣿⣿⣿⣿⡀⢐⢕⢕⢕⢕⢕⡘⣿⣿⣿⣿⣿⣿⠏⠠⠈
+⠌⢊⢂⢣⠹⣿⣿⣿⣿⣿⣿⣿⣿⣧⢐⢕⢕⢕⢕⢕⢅⣿⣿⣿⣿⡿⢋⢜⠠⠈
+⠄⠁⠕⢝⡢⠈⠻⣿⣿⣿⣿⣿⣿⣿⣷⣕⣑⣑⣑⣵⣿⣿⣿⡿⢋⢔⢕⣿⠠⠈
+⠨⡂⡀⢑⢕⡅⠂⠄⠉⠛⠻⠿⢿⣿⣿⣿⣿⣿⣿⣿⣿⡿⢋⢔⢕⢕⣿⣿⠠⠈
+⠄⠪⣂⠁⢕⠆⠄⠂⠄⠁⡀⠂⡀⠄⢈⠉⢍⢛⢛⢛⢋⢔⢕⢕⢕⣽⣿⣿⠠⠈
+#
+!--------------------------SSH------------------------------
+username CIT privilege 15 secret tc2006B
+username Admin01 privilege 15 secret tc2006B
+username Admin02 privilege 15 secret tc2006B
+
+ip domain-name Piso01.com
+crypto key generate rsa
+
+line vty 0 4
+login local
+transport input ssh
+
+line console 0
+login local
+logging sync
+!--------------------------SSH------------------------------
+
+!--------------------------DHCP------------------------------
+!-- DHCP de Visitantes
+ip dhcp excluded-address
+ip dhcp pool Visitantes
+ network 172.16.4.0 255.255.255.128
+ default-router 172.16.4.126
+ dns-server 8.8.8.8
+
+ !-- DHCP de Residentes
+ ip dhcp excluded-address
+ ip dhcp pool Residentes
+  network 172.16.4.0 255.255.255.128
+  default-router 172.16.3.254
+  dns-server 8.8.8.8
+!--------------------------DHCP------------------------------
+
+!--------------------------VLANs-----------------------------
+int g0/0/1.100
+  desc VLAN de Visitantes
+  encapsulation dot1q 100
+  ip address 172.16.4.126 255.255.255.128
+
+int g0/0/1.200
+  desc VLAN de Residentes
+  encapsulation dot1q 200
+  ip address 172.16.3.254 255.255.252.0
+
+int g0/0/1.300
+  desc VLAN de IoT
+  encapsulation dot1q 300
+  ip address 172.16.4.158 255.255.255.224
+
+int g0/0/1.400
+  desc VLAN de Seguridad
+  encapsulation dot1q 400
+  ip address 172.16.4.174 255.255.255.240
+
+int g0/0/1.911
+  desc VLAN de Gestion
+  encapsulation dot1q 911
+  ip address 172.16.4.190 255.255.255.240
+
+!Prender la interfaz fisica
+int g0/0/1
+no shutdown
+!--------------------------VLANs-----------------------------
+
+!--------------------------Interfaces------------------------
+int g0/0/0
+desc Interfaz con el ISP Alestra
+ip address 192.168.10.252 255.255.255.252
+no shutdown
+
+int s0/1/0
+desc Interfaz con el ISP Secundario AT&T
+ip address 192.168.255.252 255.255.255.252
+no shutdown
+!--------------------------Interfaces------------------------
+
+!--------------------------Direccionamiento------------------
+!--Ruta por default (Saca todo el trafico a internet)
+ip route 0.0.0.0 0.0.0.0 g0/0/0
+
+!Ruta por default flotante (ISP Secundario)
+ip route 0.0.0.0 0.0.0.0 S0/1/0 5
+!--------------------------Direccionamiento------------------
 
 ! ==========================================
 ! ============ SwitchCentral ===============
 ! ==========================================
+!--Entrar a la config
 enable
+
+!--Configurar reloj
 clock set 10:11:00 May 31 2022
+
+!--Configurar terminal
 configure terminal
 
 !-- Nombre de la terminal
@@ -24,25 +141,41 @@ no ip domain-lookup
 !--Contraseña encriptada
 service password-encryption
 
-!Asignar contraseña
-enable secret Scentral.213
-
 !-- Mensaje de protección de ingreso
-banner motd #Estas entrando a un equipo protegido, si decides continuar puedes ser perseguido por la ley#
+banner motd #
+⣿⣿⣷⡁⢆⠈⠕⢕⢂⢕⢂⢕⢂⢔⢂⢕⢄⠂⣂⠂⠆⢂⢕⢂⢕⢂⢕⢂⢕⢂
+⣿⣿⣿⡷⠊⡢⡹⣦⡑⢂⢕⢂⢕⢂⢕⢂⠕⠔⠌⠝⠛⠶⠶⢶⣦⣄⢂⢕⢂⢕
+⣿⣿⠏⣠⣾⣦⡐⢌⢿⣷⣦⣅⡑⠕⠡⠐⢿⠿⣛⠟⠛⠛⠛⠛⠡⢷⡈⢂⢕⢂
+⠟⣡⣾⣿⣿⣿⣿⣦⣑⠝⢿⣿⣿⣿⣿⣿⡵⢁⣤⣶⣶⣿⢿⢿⢿⡟⢻⣤⢑⢂
+⣾⣿⣿⡿⢟⣛⣻⣿⣿⣿⣦⣬⣙⣻⣿⣿⣷⣿⣿⢟⢝⢕⢕⢕⢕⢽⣿⣿⣷⣔
+⣿⣿⠵⠚⠉⢀⣀⣀⣈⣿⣿⣿⣿⣿⣿⣿⣿⣿⣗⢕⢕⢕⢕⢕⢕⣽⣿⣿⣿⣿
+⢷⣂⣠⣴⣾⡿⡿⡻⡻⣿⣿⣴⣿⣿⣿⣿⣿⣿⣷⣵⣵⣵⣷⣿⣿⣿⣿⣿⣿⡿
+⢌⠻⣿⡿⡫⡪⡪⡪⡪⣺⣿⣿⣿⣿⣿⠿⠿⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠃
+⠣⡁⠹⡪⡪⡪⡪⣪⣾⣿⣿⣿⣿⠋⠐⢉⢍⢄⢌⠻⣿⣿⣿⣿⣿⣿⣿⣿⠏⠈
+⡣⡘⢄⠙⣾⣾⣾⣿⣿⣿⣿⣿⣿⡀⢐⢕⢕⢕⢕⢕⡘⣿⣿⣿⣿⣿⣿⠏⠠⠈
+⠌⢊⢂⢣⠹⣿⣿⣿⣿⣿⣿⣿⣿⣧⢐⢕⢕⢕⢕⢕⢅⣿⣿⣿⣿⡿⢋⢜⠠⠈
+⠄⠁⠕⢝⡢⠈⠻⣿⣿⣿⣿⣿⣿⣿⣷⣕⣑⣑⣑⣵⣿⣿⣿⡿⢋⢔⢕⣿⠠⠈
+⠨⡂⡀⢑⢕⡅⠂⠄⠉⠛⠻⠿⢿⣿⣿⣿⣿⣿⣿⣿⣿⡿⢋⢔⢕⢕⣿⣿⠠⠈
+⠄⠪⣂⠁⢕⠆⠄⠂⠄⠁⡀⠂⡀⠄⢈⠉⢍⢛⢛⢛⢋⢔⢕⢕⢕⣽⣿⣿⠠⠈
+#
+!--------------------------SSH------------------------------
+username CIT privilege 15 secret tc2006B
+username Admin01 privilege 15 secret tc2006B
+username Admin02 privilege 15 secret tc2006B
 
-!--Asignar password a la linea de la consola
-line console 0
-password Scentral.213c
-login
-logging sync
+ip domain-name Piso01.com
+crypto key generate rsa
 
-!-- Configuracion para acceso remoto (DEFAULT 0 a 4 max)
 line vty 0 4
-password Scentral.213
-login
-logging sync
+login local
+transport input ssh
 
-! Creación de las VLANs con nombre.
+line console 0
+login local
+logging sync
+!--------------------------SSH------------------------------
+
+!--------------------------VLAN------------------------------
 vlan 100
 name Residentes
 
@@ -55,12 +188,15 @@ name Seguridad
 vlan 400
 name Visitantes
 
-! Asignación de puertos a la VLAN Residentes
+vlan 911
+name Gestion
+
+! Asignación de puertos a la VLAN Visitantes
 interface range F0/01-06
 switchport mode access
 switchport access vlan 100
 
-! Asignación de puertos a la VLAN IoT
+! Asignación de puertos a la VLAN Residentes
 interface range F0/07-12
 switchport mode access
 switchport access vlan 200
@@ -70,10 +206,10 @@ interface range F0/13-18
 switchport mode access
 switchport access vlan 300
 
-! Asignación de puertos a la VLAN Seguridad
+! Asignación de puertos a la VLAN IoT
 interface range F0/18-24
 switchport mode access
-switchport access vlan 300
+switchport access vlan 400
 
 
 ! Definición del o los puertos TRUNK
@@ -82,19 +218,24 @@ switchport mode trunk
 no shutdown
 
 
-!--Configuracion de la interfaz Virtual VLAN 1
-int vlan 1
+!--Configuracion de la interfaz Virtual VLAN 911 Gestion
+int vlan 911
 description Interfaz de Gestion
-ip address
+ip address 172.16.4.177 255.255.255.240
 no shutdown
-
-ip default-gateway
+!--------------------------VLAN------------------------------
+ip default-gateway 172.16.4.190
 
 ! ==========================================
 ! ============ SwitchVisitantes ============
 ! ==========================================
+!--Entrar a la config
 enable
+
+!--Configurar reloj
 clock set 10:11:00 May 31 2022
+
+!--Configurar terminal
 configure terminal
 
 !-- Nombre de la terminal
@@ -106,26 +247,75 @@ no ip domain-lookup
 !--Contraseña encriptada
 service password-encryption
 
-!Asignar contraseña
-enable secret Svisitantes.213
-
 !-- Mensaje de protección de ingreso
-banner motd #Estas entrando a un equipo protegido, si decides continuar puedes ser perseguido por la ley#
+banner motd #
+⣿⣿⣷⡁⢆⠈⠕⢕⢂⢕⢂⢕⢂⢔⢂⢕⢄⠂⣂⠂⠆⢂⢕⢂⢕⢂⢕⢂⢕⢂
+⣿⣿⣿⡷⠊⡢⡹⣦⡑⢂⢕⢂⢕⢂⢕⢂⠕⠔⠌⠝⠛⠶⠶⢶⣦⣄⢂⢕⢂⢕
+⣿⣿⠏⣠⣾⣦⡐⢌⢿⣷⣦⣅⡑⠕⠡⠐⢿⠿⣛⠟⠛⠛⠛⠛⠡⢷⡈⢂⢕⢂
+⠟⣡⣾⣿⣿⣿⣿⣦⣑⠝⢿⣿⣿⣿⣿⣿⡵⢁⣤⣶⣶⣿⢿⢿⢿⡟⢻⣤⢑⢂
+⣾⣿⣿⡿⢟⣛⣻⣿⣿⣿⣦⣬⣙⣻⣿⣿⣷⣿⣿⢟⢝⢕⢕⢕⢕⢽⣿⣿⣷⣔
+⣿⣿⠵⠚⠉⢀⣀⣀⣈⣿⣿⣿⣿⣿⣿⣿⣿⣿⣗⢕⢕⢕⢕⢕⢕⣽⣿⣿⣿⣿
+⢷⣂⣠⣴⣾⡿⡿⡻⡻⣿⣿⣴⣿⣿⣿⣿⣿⣿⣷⣵⣵⣵⣷⣿⣿⣿⣿⣿⣿⡿
+⢌⠻⣿⡿⡫⡪⡪⡪⡪⣺⣿⣿⣿⣿⣿⠿⠿⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠃
+⠣⡁⠹⡪⡪⡪⡪⣪⣾⣿⣿⣿⣿⠋⠐⢉⢍⢄⢌⠻⣿⣿⣿⣿⣿⣿⣿⣿⠏⠈
+⡣⡘⢄⠙⣾⣾⣾⣿⣿⣿⣿⣿⣿⡀⢐⢕⢕⢕⢕⢕⡘⣿⣿⣿⣿⣿⣿⠏⠠⠈
+⠌⢊⢂⢣⠹⣿⣿⣿⣿⣿⣿⣿⣿⣧⢐⢕⢕⢕⢕⢕⢅⣿⣿⣿⣿⡿⢋⢜⠠⠈
+⠄⠁⠕⢝⡢⠈⠻⣿⣿⣿⣿⣿⣿⣿⣷⣕⣑⣑⣑⣵⣿⣿⣿⡿⢋⢔⢕⣿⠠⠈
+⠨⡂⡀⢑⢕⡅⠂⠄⠉⠛⠻⠿⢿⣿⣿⣿⣿⣿⣿⣿⣿⡿⢋⢔⢕⢕⣿⣿⠠⠈
+⠄⠪⣂⠁⢕⠆⠄⠂⠄⠁⡀⠂⡀⠄⢈⠉⢍⢛⢛⢛⢋⢔⢕⢕⢕⣽⣿⣿⠠⠈
+#
+!--------------------------SSH------------------------------
+username CIT privilege 15 secret tc2006B
+username Admin01 privilege 15 secret tc2006B
+username Admin02 privilege 15 secret tc2006B
 
-!--Asignar password a la linea de la consola
-line console 0
-password Svisitantes.213c
-login
-logging sync
+ip domain-name Piso01.com
+crypto key generate rsa
 
-!-- Configuracion para acceso remoto (DEFAULT 0 a 4 max)
 line vty 0 4
-password Svisitantes.213
-login
-logging sync
+login local
+transport input ssh
 
-! Gateway
-ip default-gateway
+line console 0
+login local
+logging sync
+!--------------------------SSH------------------------------
+
+!--------------------------VLAN------------------------------
+vlan 100
+name Residentes
+
+vlan 200
+name IoT
+
+vlan 300
+name Seguridad
+
+vlan 400
+name Visitantes
+
+vlan 911
+name Gestion
+
+! Asignación de puertos a la VLAN Visitantes
+interface range F0/2-24, G0/2
+switchport mode access
+switchport access vlan 100
+
+! Definición del o los puertos TRUNK
+interface G0/1
+switchport mode trunk
+no shutdown
+
+
+!--Configuracion de la interfaz Virtual VLAN 911 Gestion
+int vlan 911
+description Interfaz de Gestion
+!ultima ip valida de la subred
+ip address 172.16.4.126 255.255.255.128
+no shutdown
+!--------------------------VLAN------------------------------
+ip default-gateway 172.16.4.126
 
 
 ! ==========================================
