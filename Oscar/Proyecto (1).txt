@@ -20,22 +20,7 @@ no ip domain-lookup
 service password-encryption
 
 !-- Mensaje de protección de ingreso
-banner motd #
-⣿⣿⣷⡁⢆⠈⠕⢕⢂⢕⢂⢕⢂⢔⢂⢕⢄⠂⣂⠂⠆⢂⢕⢂⢕⢂⢕⢂⢕⢂
-⣿⣿⣿⡷⠊⡢⡹⣦⡑⢂⢕⢂⢕⢂⢕⢂⠕⠔⠌⠝⠛⠶⠶⢶⣦⣄⢂⢕⢂⢕
-⣿⣿⠏⣠⣾⣦⡐⢌⢿⣷⣦⣅⡑⠕⠡⠐⢿⠿⣛⠟⠛⠛⠛⠛⠡⢷⡈⢂⢕⢂
-⠟⣡⣾⣿⣿⣿⣿⣦⣑⠝⢿⣿⣿⣿⣿⣿⡵⢁⣤⣶⣶⣿⢿⢿⢿⡟⢻⣤⢑⢂
-⣾⣿⣿⡿⢟⣛⣻⣿⣿⣿⣦⣬⣙⣻⣿⣿⣷⣿⣿⢟⢝⢕⢕⢕⢕⢽⣿⣿⣷⣔
-⣿⣿⠵⠚⠉⢀⣀⣀⣈⣿⣿⣿⣿⣿⣿⣿⣿⣿⣗⢕⢕⢕⢕⢕⢕⣽⣿⣿⣿⣿
-⢷⣂⣠⣴⣾⡿⡿⡻⡻⣿⣿⣴⣿⣿⣿⣿⣿⣿⣷⣵⣵⣵⣷⣿⣿⣿⣿⣿⣿⡿
-⢌⠻⣿⡿⡫⡪⡪⡪⡪⣺⣿⣿⣿⣿⣿⠿⠿⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠃
-⠣⡁⠹⡪⡪⡪⡪⣪⣾⣿⣿⣿⣿⠋⠐⢉⢍⢄⢌⠻⣿⣿⣿⣿⣿⣿⣿⣿⠏⠈
-⡣⡘⢄⠙⣾⣾⣾⣿⣿⣿⣿⣿⣿⡀⢐⢕⢕⢕⢕⢕⡘⣿⣿⣿⣿⣿⣿⠏⠠⠈
-⠌⢊⢂⢣⠹⣿⣿⣿⣿⣿⣿⣿⣿⣧⢐⢕⢕⢕⢕⢕⢅⣿⣿⣿⣿⡿⢋⢜⠠⠈
-⠄⠁⠕⢝⡢⠈⠻⣿⣿⣿⣿⣿⣿⣿⣷⣕⣑⣑⣑⣵⣿⣿⣿⡿⢋⢔⢕⣿⠠⠈
-⠨⡂⡀⢑⢕⡅⠂⠄⠉⠛⠻⠿⢿⣿⣿⣿⣿⣿⣿⣿⣿⡿⢋⢔⢕⢕⣿⣿⠠⠈
-⠄⠪⣂⠁⢕⠆⠄⠂⠄⠁⡀⠂⡀⠄⢈⠉⢍⢛⢛⢛⢋⢔⢕⢕⢕⣽⣿⣿⠠⠈
-#
+banner motd #Estas entrando a un equipo protegido#
 !--------------------------SSH------------------------------
 username CIT privilege 15 secret tc2006B
 username Admin01 privilege 15 secret tc2006B
@@ -55,14 +40,14 @@ logging sync
 
 !--------------------------DHCP------------------------------
 !-- DHCP de Visitantes
-ip dhcp excluded-address 172.16.4.126
-ip dhcp pool Visitantes
+ ip dhcp excluded-address 172.16.4.126
+ ip dhcp pool Visitantes
  network 172.16.4.0 255.255.255.128
  default-router 172.16.4.126
  dns-server 8.8.8.8
 
  !-- DHCP de Residentes
- ip dhcp excluded-address 172.16.3.254
+ ip dhcp excluded-address 172.16.0.1 172.16.0.4
  ip dhcp excluded-address 172.16.3.254
  ip dhcp pool Residentes
   network 172.16.0.0 255.255.252.0
@@ -104,12 +89,12 @@ no shutdown
 !--------------------------Interfaces------------------------
 int g0/0/0
 desc Interfaz con el ISP Alestra
-ip address 192.168.10.252 255.255.255.252
+ip address 192.168.10.254 255.255.255.252
 no shutdown
 
 int s0/1/0
 desc Interfaz con el ISP Secundario AT&T
-ip address 192.168.255.252 255.255.255.252
+ip address 192.168.255.254 255.255.255.252
 no shutdown
 !--------------------------Interfaces------------------------
 
@@ -143,22 +128,7 @@ no ip domain-lookup
 service password-encryption
 
 !-- Mensaje de protección de ingreso
-banner motd #
-⣿⣿⣷⡁⢆⠈⠕⢕⢂⢕⢂⢕⢂⢔⢂⢕⢄⠂⣂⠂⠆⢂⢕⢂⢕⢂⢕⢂⢕⢂
-⣿⣿⣿⡷⠊⡢⡹⣦⡑⢂⢕⢂⢕⢂⢕⢂⠕⠔⠌⠝⠛⠶⠶⢶⣦⣄⢂⢕⢂⢕
-⣿⣿⠏⣠⣾⣦⡐⢌⢿⣷⣦⣅⡑⠕⠡⠐⢿⠿⣛⠟⠛⠛⠛⠛⠡⢷⡈⢂⢕⢂
-⠟⣡⣾⣿⣿⣿⣿⣦⣑⠝⢿⣿⣿⣿⣿⣿⡵⢁⣤⣶⣶⣿⢿⢿⢿⡟⢻⣤⢑⢂
-⣾⣿⣿⡿⢟⣛⣻⣿⣿⣿⣦⣬⣙⣻⣿⣿⣷⣿⣿⢟⢝⢕⢕⢕⢕⢽⣿⣿⣷⣔
-⣿⣿⠵⠚⠉⢀⣀⣀⣈⣿⣿⣿⣿⣿⣿⣿⣿⣿⣗⢕⢕⢕⢕⢕⢕⣽⣿⣿⣿⣿
-⢷⣂⣠⣴⣾⡿⡿⡻⡻⣿⣿⣴⣿⣿⣿⣿⣿⣿⣷⣵⣵⣵⣷⣿⣿⣿⣿⣿⣿⡿
-⢌⠻⣿⡿⡫⡪⡪⡪⡪⣺⣿⣿⣿⣿⣿⠿⠿⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠃
-⠣⡁⠹⡪⡪⡪⡪⣪⣾⣿⣿⣿⣿⠋⠐⢉⢍⢄⢌⠻⣿⣿⣿⣿⣿⣿⣿⣿⠏⠈
-⡣⡘⢄⠙⣾⣾⣾⣿⣿⣿⣿⣿⣿⡀⢐⢕⢕⢕⢕⢕⡘⣿⣿⣿⣿⣿⣿⠏⠠⠈
-⠌⢊⢂⢣⠹⣿⣿⣿⣿⣿⣿⣿⣿⣧⢐⢕⢕⢕⢕⢕⢅⣿⣿⣿⣿⡿⢋⢜⠠⠈
-⠄⠁⠕⢝⡢⠈⠻⣿⣿⣿⣿⣿⣿⣿⣷⣕⣑⣑⣑⣵⣿⣿⣿⡿⢋⢔⢕⣿⠠⠈
-⠨⡂⡀⢑⢕⡅⠂⠄⠉⠛⠻⠿⢿⣿⣿⣿⣿⣿⣿⣿⣿⡿⢋⢔⢕⢕⣿⣿⠠⠈
-⠄⠪⣂⠁⢕⠆⠄⠂⠄⠁⡀⠂⡀⠄⢈⠉⢍⢛⢛⢛⢋⢔⢕⢕⢕⣽⣿⣿⠠⠈
-#
+banner motd #Estas entrando a un equipo protegido#
 !--------------------------SSH------------------------------
 username CIT privilege 15 secret tc2006B
 username Admin01 privilege 15 secret tc2006B
@@ -167,7 +137,7 @@ username Admin02 privilege 15 secret tc2006B
 ip domain-name Piso01.com
 crypto key generate rsa
 
-line vty 0 4
+line vty 0 15
 login local
 transport input ssh
 
@@ -178,43 +148,43 @@ logging sync
 
 !--------------------------VLAN------------------------------
 vlan 100
-name Residentes
+name Visitantes
 
 vlan 200
-name IoT
+name Residentes
 
 vlan 300
-name Seguridad
+name IoT
 
 vlan 400
-name Visitantes
+name Seguridad
 
 vlan 911
 name Gestion
 
 ! Asignación de puertos a la VLAN Visitantes
-interface range F0/01-06
+interface range F0/2-6
 switchport mode access
 switchport access vlan 100
 
 ! Asignación de puertos a la VLAN Residentes
-interface range F0/07-12
+interface range F0/8-12
 switchport mode access
 switchport access vlan 200
 
-! Asignación de puertos a la VLAN Seguridad
-interface range F0/13-18
+! Asignación de puertos a la VLAN IoT
+interface range F0/14-18
 switchport mode access
 switchport access vlan 300
 
-! Asignación de puertos a la VLAN IoT
-interface range F0/18-24
+! Asignación de puertos a la VLAN Seguridad
+interface range F0/20-24
 switchport mode access
 switchport access vlan 400
 
 
 ! Definición del o los puertos TRUNK
-interface G0/1
+interface range G0/1, F0/1, F0/7, F0/13, F0/19
 switchport mode trunk
 no shutdown
 
@@ -249,22 +219,7 @@ no ip domain-lookup
 service password-encryption
 
 !-- Mensaje de protección de ingreso
-banner motd #
-⣿⣿⣷⡁⢆⠈⠕⢕⢂⢕⢂⢕⢂⢔⢂⢕⢄⠂⣂⠂⠆⢂⢕⢂⢕⢂⢕⢂⢕⢂
-⣿⣿⣿⡷⠊⡢⡹⣦⡑⢂⢕⢂⢕⢂⢕⢂⠕⠔⠌⠝⠛⠶⠶⢶⣦⣄⢂⢕⢂⢕
-⣿⣿⠏⣠⣾⣦⡐⢌⢿⣷⣦⣅⡑⠕⠡⠐⢿⠿⣛⠟⠛⠛⠛⠛⠡⢷⡈⢂⢕⢂
-⠟⣡⣾⣿⣿⣿⣿⣦⣑⠝⢿⣿⣿⣿⣿⣿⡵⢁⣤⣶⣶⣿⢿⢿⢿⡟⢻⣤⢑⢂
-⣾⣿⣿⡿⢟⣛⣻⣿⣿⣿⣦⣬⣙⣻⣿⣿⣷⣿⣿⢟⢝⢕⢕⢕⢕⢽⣿⣿⣷⣔
-⣿⣿⠵⠚⠉⢀⣀⣀⣈⣿⣿⣿⣿⣿⣿⣿⣿⣿⣗⢕⢕⢕⢕⢕⢕⣽⣿⣿⣿⣿
-⢷⣂⣠⣴⣾⡿⡿⡻⡻⣿⣿⣴⣿⣿⣿⣿⣿⣿⣷⣵⣵⣵⣷⣿⣿⣿⣿⣿⣿⡿
-⢌⠻⣿⡿⡫⡪⡪⡪⡪⣺⣿⣿⣿⣿⣿⠿⠿⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠃
-⠣⡁⠹⡪⡪⡪⡪⣪⣾⣿⣿⣿⣿⠋⠐⢉⢍⢄⢌⠻⣿⣿⣿⣿⣿⣿⣿⣿⠏⠈
-⡣⡘⢄⠙⣾⣾⣾⣿⣿⣿⣿⣿⣿⡀⢐⢕⢕⢕⢕⢕⡘⣿⣿⣿⣿⣿⣿⠏⠠⠈
-⠌⢊⢂⢣⠹⣿⣿⣿⣿⣿⣿⣿⣿⣧⢐⢕⢕⢕⢕⢕⢅⣿⣿⣿⣿⡿⢋⢜⠠⠈
-⠄⠁⠕⢝⡢⠈⠻⣿⣿⣿⣿⣿⣿⣿⣷⣕⣑⣑⣑⣵⣿⣿⣿⡿⢋⢔⢕⣿⠠⠈
-⠨⡂⡀⢑⢕⡅⠂⠄⠉⠛⠻⠿⢿⣿⣿⣿⣿⣿⣿⣿⣿⡿⢋⢔⢕⢕⣿⣿⠠⠈
-⠄⠪⣂⠁⢕⠆⠄⠂⠄⠁⡀⠂⡀⠄⢈⠉⢍⢛⢛⢛⢋⢔⢕⢕⢕⣽⣿⣿⠠⠈
-#
+banner motd #Estas entrando a un equipo protegido#
 !--------------------------SSH------------------------------
 username CIT privilege 15 secret tc2006B
 username Admin01 privilege 15 secret tc2006B
@@ -273,7 +228,7 @@ username Admin02 privilege 15 secret tc2006B
 ip domain-name Piso01.com
 crypto key generate rsa
 
-line vty 0 4
+line vty 0 15
 login local
 transport input ssh
 
@@ -284,22 +239,22 @@ logging sync
 
 !--------------------------VLAN------------------------------
 vlan 100
-name Residentes
+name Visitantes
 
 vlan 200
-name IoT
+name Residentes
 
 vlan 300
-name Seguridad
+name IoT
 
 vlan 400
-name Visitantes
+name Seguridad
 
 vlan 911
 name Gestion
 
 ! Asignación de puertos a la VLAN Visitantes
-interface range F0/2-24, G0/2
+interface range F0/1-24, G0/2
 switchport mode access
 switchport access vlan 100
 
@@ -313,17 +268,23 @@ no shutdown
 int vlan 911
 description Interfaz de Gestion
 !ultima ip valida de la subred
-ip address 172.16.4.126 255.255.255.128
+ip address 172.16.4.178 255.255.255.240
 no shutdown
 !--------------------------VLAN------------------------------
-ip default-gateway 172.16.4.126
+ip default-gateway 172.16.4.190
+
 
 
 ! ==========================================
 ! ============ SwitchResidentes ============
 ! ==========================================
+!--Entrar a la config
 enable
+
+!--Configurar reloj
 clock set 10:11:00 May 31 2022
+
+!--Configurar terminal
 configure terminal
 
 !-- Nombre de la terminal
@@ -335,32 +296,73 @@ no ip domain-lookup
 !--Contraseña encriptada
 service password-encryption
 
-!Asignar contraseña
-enable secret Sresidentes.213
-
 !-- Mensaje de protección de ingreso
-banner motd #Estas entrando a un equipo protegido, si decides continuar puedes ser perseguido por la ley#
+banner motd #Estas entrando a un equipo protegido#
+!--------------------------SSH------------------------------
+username CIT privilege 15 secret tc2006B
+username Admin01 privilege 15 secret tc2006B
+username Admin02 privilege 15 secret tc2006B
 
-!--Asignar password a la linea de la consola
+ip domain-name Piso01.com
+crypto key generate rsa
+
+line vty 0 15
+login local
+transport input ssh
+
 line console 0
-password Sresidentes.213c
-login
+login local
 logging sync
+!--------------------------SSH------------------------------
 
-!-- Configuracion para acceso remoto (DEFAULT 0 a 4 max)
-line vty 0 4
-password Sresidentes.213
-login
-logging sync
+!--------------------------VLAN------------------------------
+vlan 100
+name Visitantes
 
-! Gateway
-ip default-gateway
+vlan 200
+name Residentes
+
+vlan 300
+name IoT
+
+vlan 400
+name Seguridad
+
+vlan 911
+name Gestion
+
+! Asignación de puertos a la VLAN Residentes
+interface range F0/1-24, G0/2
+switchport mode access
+switchport access vlan 200
+
+! Definición del o los puertos TRUNK
+interface G0/1
+switchport mode trunk
+no shutdown
+
+
+!--Configuracion de la interfaz Virtual VLAN 911 Gestion
+int vlan 911
+description Interfaz de Gestion
+!ultima ip valida de la subred
+ip address 172.16.4.179 255.255.255.240
+no shutdown
+!--------------------------VLAN------------------------------
+ip default-gateway 172.16.4.190
+
+
 
 ! ==========================================
-! ============ SwitchIoT ===================
+! ============ SwitchIoT ============
 ! ==========================================
+!--Entrar a la config
 enable
+
+!--Configurar reloj
 clock set 10:11:00 May 31 2022
+
+!--Configurar terminal
 configure terminal
 
 !-- Nombre de la terminal
@@ -372,33 +374,72 @@ no ip domain-lookup
 !--Contraseña encriptada
 service password-encryption
 
-!Asignar contraseña
-enable secret Siot.213
-
 !-- Mensaje de protección de ingreso
-banner motd #Estas entrando a un equipo protegido, si decides continuar puedes ser perseguido por la ley#
+banner motd #Estas entrando a un equipo protegido#
+!--------------------------SSH------------------------------
+username CIT privilege 15 secret tc2006B
+username Admin01 privilege 15 secret tc2006B
+username Admin02 privilege 15 secret tc2006B
 
-!--Asignar password a la linea de la consola
+ip domain-name Piso01.com
+crypto key generate rsa
+
+line vty 0 15
+login local
+transport input ssh
+
 line console 0
-password Siot.213c
-login
+login local
 logging sync
+!--------------------------SSH------------------------------
 
-!-- Configuracion para acceso remoto (DEFAULT 0 a 4 max)
-line vty 0 4
-password Siot.213
-login
-logging sync
+!--------------------------VLAN------------------------------
+vlan 100
+name Visitantes
 
-! Gateway
-ip default-gateway
+vlan 200
+name Residentes
+
+vlan 300
+name IoT
+
+vlan 400
+name Seguridad
+
+vlan 911
+name Gestion
+
+! Asignación de puertos a la VLAN IoT
+interface range F0/1-24, G0/2
+switchport mode access
+switchport access vlan 300
+
+! Definición del o los puertos TRUNK
+interface G0/1
+switchport mode trunk
+no shutdown
+
+
+!--Configuracion de la interfaz Virtual VLAN 911 Gestion
+int vlan 911
+description Interfaz de Gestion
+!ultima ip valida de la subred
+ip address 172.16.4.180 255.255.255.240
+no shutdown
+!--------------------------VLAN------------------------------
+ip default-gateway 172.16.4.190
 
 
 ! ==========================================
-! ============ SwitchSeguridad==============
+! ============ SwitchSeguridad ============
 ! ==========================================
+!--Entrar a la config
 enable
+
+!--Configurar reloj
 clock set 10:11:00 May 31 2022
+
+!--Configurar terminal
 configure terminal
 
 !-- Nombre de la terminal
@@ -410,23 +451,57 @@ no ip domain-lookup
 !--Contraseña encriptada
 service password-encryption
 
-!Asignar contraseña
-enable secret Sseguridad.213
-
 !-- Mensaje de protección de ingreso
-banner motd #Estas entrando a un equipo protegido, si decides continuar puedes ser perseguido por la ley#
+banner motd #Estas entrando a un equipo protegido#
+!--------------------------SSH------------------------------
+username CIT privilege 15 secret tc2006B
+username Admin01 privilege 15 secret tc2006B
+username Admin02 privilege 15 secret tc2006B
 
-!--Asignar password a la linea de la consola
+ip domain-name Piso01.com
+crypto key generate rsa
+
+line vty 0 15
+login local
+transport input ssh
+
 line console 0
-password Sseguridad.213c
-login
+login local
 logging sync
+!--------------------------SSH------------------------------
 
-!-- Configuracion para acceso remoto (DEFAULT 0 a 4 max)
-line vty 0 4
-password Sseguridad.213
-login
-logging sync
+!--------------------------VLAN------------------------------
+vlan 100
+name Visitantes
 
-! Gateway
-ip default-gateway
+vlan 200
+name Residentes
+
+vlan 300
+name IoT
+
+vlan 400
+name Seguridad
+
+vlan 911
+name Gestion
+
+! Asignación de puertos a la VLAN Seguridad
+interface range F0/1-24, G0/2
+switchport mode access
+switchport access vlan 400
+
+! Definición del o los puertos TRUNK
+interface G0/1
+switchport mode trunk
+no shutdown
+
+
+!--Configuracion de la interfaz Virtual VLAN 911 Gestion
+int vlan 911
+description Interfaz de Gestion
+!ultima ip valida de la subred
+ip address 172.16.4.181 255.255.255.240
+no shutdown
+!--------------------------VLAN------------------------------
+ip default-gateway 172.16.4.190
